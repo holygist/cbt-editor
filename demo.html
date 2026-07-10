@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Demo — Free CBT Equation Editor (Math &amp; Chemistry)</title>
+  <link rel="stylesheet" href="cbt-editor.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 30px 20px; }
+    .page { max-width: 780px; margin: 0 auto; }
+    h1 { font-size: 1.5rem; color: #111827; margin-bottom: 4px; }
+    .subtitle { color: #6b7280; font-size: 0.9rem; margin-bottom: 20px; }
+    .subtitle a { color: #2563eb; }
+    .demo-box { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+    .demo-box h2 { font-size: 1.05rem; color: #111827; margin-bottom: 10px; }
+    .demo-box p { font-size: 0.88rem; color: #6b7280; margin-bottom: 12px; }
+    form label { display: block; font-weight: 600; font-size: 0.88rem; margin-bottom: 4px; color: #374151; }
+    form input[type="text"] { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.95rem; margin-bottom: 12px; }
+    form button[type="submit"] { padding: 10px 24px; background: #2563eb; color: #fff; border: none; border-radius: 6px; font-size: 0.95rem; font-weight: 600; cursor: pointer; }
+    form button[type="submit"]:hover { background: #1d4ed8; }
+    .result { margin-top: 16px; background: #1e293b; color: #e2e8f0; padding: 14px 18px; border-radius: 8px; font-family: 'SF Mono', 'Consolas', monospace; font-size: 0.78rem; white-space: pre-wrap; max-height: 350px; overflow-y: auto; display: none; }
+    .result.show { display: block; }
+    .instructions { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 12px 16px; font-size: 0.85rem; color: #1e40af; line-height: 1.6; }
+    .instructions code { background: #dbeafe; padding: 1px 5px; border-radius: 3px; font-size: 0.9em; }
+  </style>
+</head>
+<body>
+<div class="page">
+  <h1>🧪 CBTEditor — Live Demo</h1>
+  <p class="subtitle">
+    Try the editor below. Type text, click <strong>📐 Math</strong> to build an equation,
+    click <strong>⚗️ Chem</strong> to build a formula. Then submit the form to see the JSON.
+    <br><a href="docs.html">📚 Documentation</a> &nbsp;|&nbsp; <a href="index.html">← Home</a>
+  </p>
+
+  <div class="demo-box">
+    <h2>📝 Create a Document</h2>
+    <p>This form uses the editor like a <code>&lt;textarea&gt;</code>. No save buttons — just fill in and submit.</p>
+
+    <form id="demo-form" onsubmit="handleSubmit(event)">
+      <label for="title">Document Title</label>
+      <input type="text" id="title" name="title" placeholder="Enter a title..." required>
+
+      <label>Content</label>
+      <div id="editor" name="content"></div>
+
+      <button type="submit">📤 Submit Form</button>
+    </form>
+
+    <div class="result" id="result"></div>
+  </div>
+
+  <div class="instructions">
+    <strong>💡 Try this:</strong> Click <code>📐 Math</code> in the toolbar →
+    click the green dashed box → type <code>E=mc^2</code> → press Escape.
+    Then click <code>⚗️ Chem</code> → click the red dashed box →
+    build <code>2H₂ + O₂ → 2H₂O</code> → click ✓ Done.
+    <strong>Submit the form</strong> and you'll see the complete JSON —
+    including the math LaTeX and chemistry formula tree.
+  </div>
+
+  <div class="demo-box" style="margin-top:20px;">
+    <h2>📝 Multi-Editor: CBT Exam Question</h2>
+    <p>
+      Need multiple editors on one page? Give each a <strong>unique <code>name</code></strong>.
+      This form has two editors: one for the question body, one for the explanation.
+      All submit as separate fields via POST.
+    </p>
+    <form onsubmit="handleMultiSubmit(event)">
+      <label>Question (rich text + math)</label>
+      <div id="editor-q" name="question"></div>
+
+      <label>Explanation (rich text)</label>
+      <div id="editor-e" name="explanation"></div>
+
+      <label>Option A</label>
+      <input type="text" name="opt_a" placeholder="Option A" required>
+
+      <label>Option B</label>
+      <input type="text" name="opt_b" placeholder="Option B" required>
+
+      <button type="submit">📤 Submit Question</button>
+    </form>
+    <div class="result" id="result-multi"></div>
+  </div>
+</div>
+
+<script src="cbt-editor.min.js"></script>
+<script>
+  CBTEditor.setMathLiveFontsDir('./fonts');
+
+  new CBTEditor({ target: document.getElementById('editor') });
+
+  // ── Second editor (multi-editor demo) ──────────────────────
+  new CBTEditor({ target: document.getElementById('editor-q') });
+  new CBTEditor({ target: document.getElementById('editor-e') });
+
+  function countBlocks(doc, type) {
+    let n = 0;
+    const walk = (nodes) => {
+      for (const nd of nodes) { if (nd.type === type) n++; if (nd.content) walk(nd.content); }
+    };
+    walk(doc.content || []);
+    return n;
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.target));
+    const content = JSON.parse(data.content);
+    const mathCount = countBlocks(content, 'mathBlock');
+    const chemCount = countBlocks(content, 'chemBlock');
+
+    document.getElementById('result').className = 'result show';
+    document.getElementById('result').textContent =
+      '✅ Form submitted!\n\n' +
+      'Title: ' + data.title + '\n' +
+      'Math blocks: ' + mathCount + '\n' +
+      'Chemistry blocks: ' + chemCount + '\n\n' +
+      'Content (JSON):\n' + JSON.stringify(content, null, 2) + '\n\n' +
+      '─── In PHP, you would receive: ───\n' +
+      '$_POST["title"]   = "' + data.title + '"\n' +
+      '$_POST["content"] = (the JSON above)\n\n' +
+      'Store it directly in your database as a JSON/TEXT column.';
+
+    // Scroll the result into view
+    document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function handleMultiSubmit(e) {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.target));
+    document.getElementById('result-multi').className = 'result show';
+    document.getElementById('result-multi').textContent =
+      '✅ Multi-editor form submitted!\n\n' +
+      'Fields received:\n' +
+      '  $_POST["question"]    = (JSON below)\n' +
+      '  $_POST["explanation"] = (JSON below)\n' +
+      '  $_POST["opt_a"]       = "' + (data.opt_a || '') + '"\n' +
+      '  $_POST["opt_b"]       = "' + (data.opt_b || '') + '"\n\n' +
+      'Question JSON:\n' + JSON.stringify(JSON.parse(data.question || '{}'), null, 2) + '\n\n' +
+      'Explanation JSON:\n' + JSON.stringify(JSON.parse(data.explanation || '{}'), null, 2) + '\n\n' +
+      '💡 Multiple editors → each gets its own name → separate $_POST fields.';
+    document.getElementById('result-multi').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+</script>
+</body>
+</html>

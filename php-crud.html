@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PHP CRUD Guide — CBTEditor</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      line-height: 1.65;
+      display: flex;
+    }
+
+    /* ── Sidebar ──────────────────────────────────── */
+    .sidebar {
+      width: 260px; min-width: 260px; height: 100vh;
+      position: sticky; top: 0;
+      background: #1e293b; color: #e2e8f0;
+      padding: 24px 0; overflow-y: auto; font-size: 0.9rem;
+    }
+    .sidebar .brand { padding: 0 20px 20px; border-bottom: 1px solid #334155; margin-bottom: 12px; }
+    .sidebar .brand h2 { font-size: 1.2rem; color: #fff; }
+    .sidebar .brand a { color: #94a3b8; font-size: 0.8rem; text-decoration: none; }
+    .sidebar .brand a:hover { color: #fff; }
+    .sidebar nav a {
+      display: block; padding: 8px 20px; color: #cbd5e1;
+      text-decoration: none; border-left: 3px solid transparent;
+      font-size: 0.88rem; transition: background 0.15s, border-color 0.15s;
+    }
+    .sidebar nav a:hover { background: #334155; color: #fff; }
+    .sidebar nav a.active { background: #334155; color: #fff; border-left-color: #3b82f6; font-weight: 600; }
+    .sidebar nav .section-title {
+      padding: 16px 20px 6px; font-size: 0.72rem;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: #64748b; font-weight: 700;
+    }
+
+    /* ── Main ─────────────────────────────────────── */
+    .main { flex: 1; min-width: 0; padding: 40px 48px 80px; max-width: 920px; }
+    .main h1 { font-size: 2rem; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
+    .main h2 { font-size: 1.4rem; font-weight: 700; color: #0f172a; margin: 36px 0 14px; padding-bottom: 6px; border-bottom: 1px solid #e2e8f0; }
+    .main h3 { font-size: 1.1rem; font-weight: 600; color: #1e293b; margin: 22px 0 8px; }
+    .main p { margin-bottom: 12px; font-size: 0.95rem; }
+    .main ul, .main ol { margin: 8px 0 16px 20px; font-size: 0.95rem; }
+    .main li { margin-bottom: 6px; }
+    .main code {
+      background: #f1f5f9; padding: 1px 6px; border-radius: 4px;
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.88em; color: #1e293b;
+    }
+    .main pre {
+      background: #1e293b; color: #e2e8f0;
+      padding: 16px 20px; border-radius: 8px; overflow-x: auto;
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.81rem; line-height: 1.55; margin: 12px 0 20px;
+    }
+    .main pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+
+    /* ── Flow diagram ─────────────────────────────── */
+    .flow {
+      display: flex; align-items: center; gap: 12px;
+      flex-wrap: wrap; margin: 20px 0; font-size: 0.9rem;
+    }
+    .flow .step {
+      background: #fff; border: 1px solid #e2e8f0;
+      border-radius: 8px; padding: 12px 16px; text-align: center;
+      font-weight: 600; white-space: nowrap;
+    }
+    .flow .step.c { border-color: #3b82f6; color: #2563eb; }
+    .flow .step.r { border-color: #22c55e; color: #16a34a; }
+    .flow .step.u { border-color: #f59e0b; color: #d97706; }
+    .flow .step.d { border-color: #ef4444; color: #dc2626; }
+    .flow .arrow { font-size: 1.3rem; color: #94a3b8; }
+
+    .callout {
+      background: #eff6ff; border: 1px solid #bfdbfe;
+      border-radius: 6px; padding: 12px 16px; margin: 16px 0; font-size: 0.9rem;
+    }
+    .callout.tip { background: #f0fdf4; border-color: #bbf7d0; }
+    .callout.warn { background: #fef3c7; border-color: #fcd34d; }
+
+    /* ── File tabs ────────────────────────────────── */
+    .file-tabs { display: flex; gap: 0; margin-bottom: 0; }
+    .file-tab {
+      padding: 6px 16px; border: 1px solid #334155; border-bottom: none;
+      border-radius: 6px 6px 0 0; font-size: 0.78rem; font-weight: 600;
+      font-family: 'SF Mono', 'Consolas', monospace;
+      background: #0f172a; color: #94a3b8; cursor: pointer;
+    }
+    .file-tab.active { background: #1e293b; color: #e2e8f0; }
+    pre.file-content { border-radius: 0 8px 8px 8px; margin-top: 0; }
+
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      .sidebar { width: 100%; min-width: 100%; height: auto; position: static; padding: 12px 0; }
+      .sidebar nav { display: flex; flex-wrap: wrap; gap: 2px; padding: 0 12px; }
+      .sidebar nav .section-title { display: none; }
+      .sidebar nav a { border-left: none; border-radius: 4px; padding: 6px 12px; font-size: 0.8rem; }
+      .main { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═════════════════════ SIDEBAR ═══════════════════════ -->
+<aside class="sidebar">
+  <div class="brand">
+    <h2>🧪 CBTEditor</h2>
+    <a href="index.html">← Back to Home</a> &nbsp;|&nbsp;
+    <a href="docs.html">← Docs</a>
+  </div>
+  <nav id="sidebar-nav">
+    <span class="section-title">PHP CRUD</span>
+    <a href="#overview">Overview</a>
+    <a href="#setup">Project Setup</a>
+    <a href="#create">CREATE — Insert</a>
+    <a href="#read">READ — Display</a>
+    <a href="#update">UPDATE — Edit</a>
+    <a href="#delete">DELETE — Remove</a>
+    <a href="#full-flow">Full Flow</a>
+    <a href="#cbt-exam">CBT Exam Example</a>
+    <a href="demo.html">🎮 Live Demo</a>
+  </nav>
+</aside>
+
+<!-- ═════════════════════ MAIN ═══════════════════════════ -->
+<main class="main">
+
+  <section id="overview">
+    <h1>🐘 PHP + CBTEditor — Full CRUD Guide</h1>
+    <p>
+      This guide shows how to use CBTEditor in a <strong>PHP + MySQL</strong> application
+      for creating, reading, updating, and deleting rich documents with math and chemistry blocks.
+      All code examples are real, working patterns — not pseudocode.
+    </p>
+
+    <div class="flow">
+      <div class="step c">📝 CREATE<br><small>Insert new doc</small></div>
+      <div class="arrow">→</div>
+      <div class="step r">👁 READ<br><small>Display saved doc</small></div>
+      <div class="arrow">→</div>
+      <div class="step u">✏️ UPDATE<br><small>Edit &amp; save changes</small></div>
+      <div class="arrow">→</div>
+      <div class="step d">🗑 DELETE<br><small>Remove doc</small></div>
+    </div>
+
+    <div class="callout tip">
+      <strong>💡 No PHP files to write.</strong> The examples below show you the patterns.
+      Drop CBTEditor's <code>.js</code> and <code>.css</code> files into your project,
+      add a few lines of PHP, and you're done. The editor is just a
+      <code>&lt;script&gt;</code> tag — it works with <em>any</em> backend.
+    </div>
+  </section>
+
+  <!-- ── SETUP ──────────────────────────────────────────── -->
+  <section id="setup">
+    <h2>Project Setup</h2>
+    <p>Your project folder should look like this:</p>
+    <pre><code>your-php-app/
+├── cbt-editor/
+│   ├── cbt-editor.min.js
+│   ├── cbt-editor.min.css
+│   └── fonts/
+├── index.php              ← list all documents
+├── create.php             ← new document form
+├── edit.php               ← edit existing document
+├── view.php               ← view document (read-only)
+├── delete.php             ← delete confirmation
+├── save.php               ← API: handles save (POST)
+└── db.php                 ← database connection</code></pre>
+
+    <h3>Database Table</h3>
+    <pre><code>CREATE TABLE documents (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    content JSON NOT NULL,           -- the TipTap document JSON
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);</code></pre>
+
+    <div class="callout">
+      <strong>🔑 Key decision:</strong> Store the document as <strong>JSON</strong> in a
+      <code>JSON</code> column (MySQL 5.7+) or <code>TEXT</code> column.
+      The JSON contains the full document — text, formatting, math blocks, chemistry blocks,
+      tables — everything. You never need to parse it on the server; just store it and serve it back.
+    </div>
+  </section>
+
+  <!-- ── CREATE ────────────────────────────────────────── -->
+  <section id="create">
+    <h2>CREATE — Insert a New Document</h2>
+    <p>
+      The user opens <code>create.php</code>, sees a blank CBTEditor, builds their document
+      (text + math + chemistry), and submits the form. The editor auto-syncs its JSON
+      into a hidden <code>&lt;input name="content"&gt;</code> — no save button needed.
+    </p>
+
+    <h3>create.php — The form page</h3>
+    <pre><code>&lt;?php
+// create.php — New document form
+// The form POSTs to itself. On POST, save to DB and redirect.
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_once 'db.php';
+    $title   = $_POST['title'] ?? 'Untitled';
+    $content = $_POST['content'];   // ← the editor's JSON, auto-synced
+
+    $stmt = $pdo->prepare('INSERT INTO documents (title, content) VALUES (?, ?)');
+    $stmt->execute([$title, $content]);
+    $newId = $pdo->lastInsertId();
+
+    header('Location: view.php?id=' . $newId);
+    exit;
+}
+?&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;New Document&lt;/title&gt;
+  &lt;link rel="stylesheet" href="cbt-editor/cbt-editor.min.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+  &lt;h1&gt;📝 Create New Document&lt;/h1&gt;
+
+  &lt;form method="POST"&gt;
+    &lt;label&gt;Title:&lt;/label&gt;
+    &lt;input type="text" name="title" placeholder="Document title..." required&gt;
+
+    &lt;label&gt;Content:&lt;/label&gt;
+    &lt;div id="editor"&gt;&lt;/div&gt;
+
+    &lt;button type="submit"&gt;📤 Submit&lt;/button&gt;
+  &lt;/form&gt;
+
+  &lt;script src="cbt-editor/cbt-editor.min.js"&gt;&lt;/script&gt;
+  &lt;script&gt;
+    CBTEditor.setMathLiveFontsDir('cbt-editor/fonts');
+
+    new CBTEditor({
+      target: document.getElementById('editor'),
+      name: 'content'   // ← auto-syncs JSON to hidden &lt;input name="content"&gt;
+    });
+  &lt;/script&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+    <h3>How the save works (no fetch() needed)</h3>
+    <p>
+      When the form is submitted, <code>$_POST['content']</code> contains the
+      full document JSON — including all math and chemistry blocks. PHP inserts
+      it directly into the database. <strong>No JavaScript fetch(), no save button,
+      no custom API endpoint.</strong> Just a normal HTML form.
+    </p>
+}</code></pre>
+
+    <div class="callout tip">
+      <strong>✅ CREATE summary:</strong> User types → clicks Save → JSON sent via
+      <code>fetch()</code> → PHP inserts into <code>documents</code> table →
+      returns the new ID.
+    </div>
+  </section>
+
+  <!-- ── READ ──────────────────────────────────────────── -->
+  <section id="read">
+    <h2>READ — Display a Saved Document</h2>
+    <p>
+      <code>view.php?id=5</code> loads document #5 from the database and displays it.
+      Two modes: <strong>read-only</strong> (just view) or <strong>editable</strong>
+      (for the UPDATE workflow below).
+    </p>
+
+    <h3>view.php — Read-only display</h3>
+    <pre><code>&lt;?php
+require_once 'db.php';
+
+$id = $_GET['id'] ?? null;
+if (!$id) { die('Missing document ID'); }
+
+$stmt = $pdo->prepare('SELECT * FROM documents WHERE id = ?');
+$stmt->execute([$id]);
+$doc = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$doc) { die('Document not found'); }
+
+// The content is stored as a JSON string — decode it for the editor
+$contentJSON = $doc['content'];
+?&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;&lt;?php echo htmlspecialchars($doc['title']); ?&gt;&lt;/title&gt;
+  &lt;link rel="stylesheet" href="cbt-editor/cbt-editor.min.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+  &lt;h1&gt;&lt;?php echo htmlspecialchars($doc['title']); ?&gt;&lt;/h1&gt;
+  &lt;p&gt;
+    Created: &lt;?php echo $doc['created_at']; ?&gt; |
+    Updated: &lt;?php echo $doc['updated_at']; ?&gt; |
+    &lt;a href="edit.php?id=&lt;?php echo $id; ?&gt;"&gt;✏️ Edit&lt;/a&gt; |
+    &lt;a href="delete.php?id=&lt;?php echo $id; ?&gt;"&gt;🗑 Delete&lt;/a&gt;
+  &lt;/p&gt;
+
+  &lt;div id="editor"&gt;&lt;/div&gt;
+
+  &lt;script src="cbt-editor/cbt-editor.min.js"&gt;&lt;/script&gt;
+  &lt;script&gt;
+    CBTEditor.setMathLiveFontsDir('cbt-editor/fonts');
+
+    // Load the saved document — math &amp; chem blocks are EDITABLE
+    const savedDoc = &lt;?php echo $contentJSON; ?&gt;;
+
+    const editor = new CBTEditor({
+      target: document.getElementById('editor'),
+      initialContent: savedDoc,   // ← reconstructions math/chem blocks
+      readOnly: true              // ← read-only mode (no editing)
+    });
+  &lt;/script&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+    <div class="callout warn">
+      <strong>⚠️ Critical:</strong> When you pass <code>initialContent: savedDoc</code>,
+      the math and chemistry blocks are reconstructed as <strong>fully interactive
+      editors</strong>, not static images or text. The quadratic formula is a live
+      MathLive field. The chemistry formula is a live formula builder.
+      <br><br>
+      <strong>To make it read-only:</strong> set <code>readOnly: true</code> in the
+      CBTEditor options. The blocks still render visually but aren't clickable.
+      <br><br>
+      <strong>To make it editable:</strong> set <code>readOnly: false</code> (or omit it).
+      Users can click math/chem blocks to edit them.
+    </div>
+  </section>
+
+  <!-- ── UPDATE ────────────────────────────────────────── -->
+  <section id="update">
+    <h2>UPDATE — Edit an Existing Document</h2>
+    <p>
+      This is the most common workflow. User opens <code>edit.php?id=5</code>,
+      sees their previously saved document <strong>with all math/chem blocks live and
+      editable</strong>, makes changes, and submits the form. The updated JSON is sent
+      via a normal form POST — no JavaScript fetch() needed.
+    </p>
+
+    <h3>edit.php — The edit form</h3>
+    <pre><code>&lt;?php
+require_once 'db.php';
+
+$id = $_GET['id'] ?? null;
+if (!$id) { die('Missing document ID'); }
+
+// ── Handle form submission (UPDATE) ────────────────────
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $title   = $_POST['title'] ?? 'Untitled';
+    $content = $_POST['content'];   // ← editor auto-synced JSON
+
+    $stmt = $pdo->prepare(
+        'UPDATE documents SET title = ?, content = ?, updated_at = NOW() WHERE id = ?'
+    );
+    $stmt->execute([$title, $content, $id]);
+    header('Location: view.php?id=' . $id . '&saved=1');
+    exit;
+}
+
+// ── Load existing document ─────────────────────────────
+$stmt = $pdo->prepare('SELECT * FROM documents WHERE id = ?');
+$stmt->execute([$id]);
+$doc = $stmt->fetch(PDO::FETCH_ASSOC);
+if (!$doc) { die('Document not found'); }
+
+$contentJSON = $doc['content'];
+?&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Edit: &lt;?php echo htmlspecialchars($doc['title']); ?&gt;&lt;/title&gt;
+  &lt;link rel="stylesheet" href="cbt-editor/cbt-editor.min.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+  &lt;h1&gt;✏️ Edit Document&lt;/h1&gt;
+
+  &lt;form method="POST"&gt;
+    &lt;label&gt;Title:&lt;/label&gt;
+    &lt;input type="text" name="title"
+           value="&lt;?php echo htmlspecialchars($doc['title']); ?&gt;"&gt;
+
+    &lt;label&gt;Content:&lt;/label&gt;
+    &lt;div id="editor"&gt;&lt;/div&gt;
+
+    &lt;button type="submit"&gt;💾 Save Changes&lt;/button&gt;
+  &lt;/form&gt;
+
+  &lt;script src="cbt-editor/cbt-editor.min.js"&gt;&lt;/script&gt;
+  &lt;script&gt;
+    CBTEditor.setMathLiveFontsDir('cbt-editor/fonts');
+
+    const savedDoc = &lt;?php echo $contentJSON; ?&gt;;
+
+    new CBTEditor({
+      target: document.getElementById('editor'),
+      name: 'content',        // ← auto-syncs to hidden &lt;input name="content"&gt;
+      value: savedDoc         // ← pre-load existing content (math/chem blocks ARE editable)
+    });
+
+    console.log('✅ Document #&lt;?php echo $id; ?&gt; loaded for editing.');
+  &lt;/script&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+    <div class="callout tip">
+      <strong>✅ UPDATE summary:</strong> Page loads → document appears with live
+      math/chem blocks → user edits text, clicks equations, changes formulas →
+      clicks the form's <strong>Submit</strong> button → PHP receives
+      <code>$_POST['content']</code> with the updated JSON → UPDATE query runs.
+      No <code>fetch()</code>, no custom API endpoint, just a normal HTML form.
+    </div>
+
+    <h3>The Round-Trip Guarantee</h3>
+    <p>
+      When <code>edit.php</code> loads, the saved JSON from the database is passed
+      to <code>initialContent</code>. The CBTEditor internally calls
+      <code>importFromJSON()</code>, which reconstructs the full ProseMirror document tree:
+    </p>
+    <ul>
+      <li><strong>Math blocks</strong> → live <code>&lt;math-field&gt;</code> MathLive web components (click to open visual editor)</li>
+      <li><strong>Chemistry blocks</strong> → live formula builders with coefficient spinners, subscript fields, arrow dropdowns</li>
+      <li><strong>Tables, lists, headings, bold/italic</strong> → all standard TipTap formatting</li>
+    </ul>
+    <p>Nothing is ever flattened to static text or images — as long as the JSON contains
+    <code>"type": "mathBlock"</code> / <code>"type": "chemBlock"</code> nodes with their
+    attributes intact.</p>
+  </section>
+
+  <!-- ── DELETE ────────────────────────────────────────── -->
+  <section id="delete">
+    <h2>DELETE — Remove a Document</h2>
+    <p>Simple PHP page with confirmation:</p>
+
+    <pre><code>&lt;?php
+// delete.php?id=5
+require_once 'db.php';
+
+$id = $_GET['id'] ?? null;
+if (!$id) { die('Missing document ID'); }
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Confirmed — delete it
+    $stmt = $pdo->prepare('DELETE FROM documents WHERE id = ?');
+    $stmt->execute([$id]);
+    header('Location: index.php?deleted=' . $id);
+    exit;
+}
+
+// Show confirmation page
+$stmt = $pdo->prepare('SELECT title FROM documents WHERE id = ?');
+$stmt->execute([$id]);
+$doc = $stmt->fetch();
+?&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;&lt;title&gt;Delete Document&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;🗑 Delete "&lt;?php echo htmlspecialchars($doc['title']); ?&gt;"?&lt;/h1&gt;
+  &lt;p&gt;This cannot be undone. The math equations and chemistry formulas
+     in this document will be permanently deleted.&lt;/p&gt;
+  &lt;form method="post"&gt;
+    &lt;button type="submit"&gt;Yes, Delete&lt;/button&gt;
+    &lt;a href="view.php?id=&lt;?php echo $id; ?&gt;"&gt;Cancel&lt;/a&gt;
+  &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+  </section>
+
+  <!-- ── FULL FLOW ─────────────────────────────────────── -->
+  <section id="full-flow">
+    <h2>Full CRUD Flow — End to End</h2>
+
+    <h3>Database Connection (db.php)</h3>
+    <pre><code>&lt;?php
+// db.php — Shared database connection
+$host = 'localhost';
+$db   = 'my_cbt_app';
+$user = 'root';
+$pass = '';
+$charset = 'utf8mb4';
+
+$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+$options = [
+    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES   => false,
+];
+
+try {
+    $pdo = new PDO($dsn, $user, $pass, $options);
+} catch (PDOException $e) {
+    die('Database connection failed: ' . $e->getMessage());
+}</code></pre>
+
+    <h3>index.php — List All Documents</h3>
+    <pre><code>&lt;?php
+require_once 'db.php';
+
+$stmt = $pdo->query(
+    'SELECT id, title, created_at, updated_at FROM documents ORDER BY updated_at DESC'
+);
+$docs = $stmt->fetchAll();
+?&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;&lt;title&gt;My Documents&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;📚 My Documents&lt;/h1&gt;
+  &lt;a href="create.php"&gt;📝 Create New&lt;/a&gt;
+
+  &lt;?php if (isset($_GET['deleted'])): ?&gt;
+    &lt;p style="color:green"&gt;✅ Document #&lt;?php echo $_GET['deleted']; ?&gt; deleted.&lt;/p&gt;
+  &lt;?php endif; ?&gt;
+
+  &lt;table&gt;
+    &lt;tr&gt;&lt;th&gt;Title&lt;/th&gt;&lt;th&gt;Updated&lt;/th&gt;&lt;th&gt;Actions&lt;/th&gt;&lt;/tr&gt;
+    &lt;?php foreach ($docs as $doc): ?&gt;
+    &lt;tr&gt;
+      &lt;td&gt;&lt;?php echo htmlspecialchars($doc['title']); ?&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;?php echo $doc['updated_at']; ?&gt;&lt;/td&gt;
+      &lt;td&gt;
+        &lt;a href="view.php?id=&lt;?php echo $doc['id']; ?&gt;"&gt;👁 View&lt;/a&gt;
+        &lt;a href="edit.php?id=&lt;?php echo $doc['id']; ?&gt;"&gt;✏️ Edit&lt;/a&gt;
+        &lt;a href="delete.php?id=&lt;?php echo $doc['id']; ?&gt;"&gt;🗑 Delete&lt;/a&gt;
+      &lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;?php endforeach; ?&gt;
+  &lt;/table&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+    <h3>Complete Request Flow</h3>
+    <table>
+      <tr><th>Action</th><th>URL</th><th>Method</th><th>What Happens</th></tr>
+      <tr>
+        <td>Create</td>
+        <td><code>create.php</code> → <code>save.php</code></td>
+        <td>GET → POST</td>
+        <td>User builds doc in editor → clicks Save → JSON sent to save.php → INSERT into DB → returns ID</td>
+      </tr>
+      <tr>
+        <td>Read</td>
+        <td><code>view.php?id=5</code></td>
+        <td>GET</td>
+        <td>PHP loads JSON from DB → echoed into <code>&lt;script&gt;</code> tag → editor renders with <code>readOnly: true</code></td>
+      </tr>
+      <tr>
+        <td>Update</td>
+        <td><code>edit.php?id=5</code> → <code>save.php</code></td>
+        <td>GET → POST</td>
+        <td>PHP loads JSON → editor renders EDITABLE → user edits → clicks Save → JSON sent with <code>id</code> → UPDATE query</td>
+      </tr>
+      <tr>
+        <td>Delete</td>
+        <td><code>delete.php?id=5</code></td>
+        <td>GET → POST</td>
+        <td>Confirmation page → user confirms → DELETE query → redirect to index</td>
+      </tr>
+    </table>
+
+    <div class="callout warn">
+      <strong>⚠️ Remember:</strong> The document JSON stored in the database contains
+      <em>everything</em> — text, formatting, math equations (as LaTeX strings),
+      chemistry formulas (as JSON trees), table data. <strong>Never modify the JSON
+      structure</strong> on the server side. Treat it as an opaque blob.
+      CBTEditor's <code>importFromJSON()</code> handles all reconstruction.
+    </div>
+  </section>
+
+  <!-- ── CBT EXAM EXAMPLE ──────────────────────────────── -->
+  <section id="cbt-exam">
+    <h2>📝 Real Example: CBT Exam System</h2>
+    <p>
+      This is the exact use case you described: a Computer-Based Test system where
+      <strong>questions</strong> use the rich editor (with math &amp; chemistry), and
+      questions display as <strong>readable formatted HTML</strong> to students
+      (not raw JSON gibberish).
+    </p>
+
+    <h3>Database Table</h3>
+    <pre><code>CREATE TABLE exam_questions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    exam_id INT NOT NULL,
+    question JSON NOT NULL,            -- CBTEditor document (the question body)
+    option_a TEXT NOT NULL,            -- plain text or JSON if using editor
+    option_b TEXT NOT NULL,
+    option_c TEXT NOT NULL,
+    option_d TEXT NOT NULL,
+    correct_answer CHAR(1) NOT NULL,   -- 'A', 'B', 'C', or 'D'
+    marks INT DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);</code></pre>
+
+    <h3>CREATE — Add a New Exam Question</h3>
+    <p>The question body uses CBTEditor. Options can be plain text inputs or their own editors. Instructions are plain text.</p>
+    <pre><code>&lt;?php
+// questions/create.php
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_once '../db.php';
+    $stmt = $pdo->prepare(
+        'INSERT INTO exam_questions (exam_id, question, option_a, option_b, option_c, option_d, correct_answer, marks)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+    );
+    $stmt->execute([
+        $_POST['exam_id'],
+        $_POST['question'],        // ← CBTEditor auto-synced JSON
+        $_POST['option_a'],
+        $_POST['option_b'],
+        $_POST['option_c'],
+        $_POST['option_d'],
+        $_POST['correct_answer'],
+        $_POST['marks'] ?? 1
+    ]);
+    header('Location: list.php?exam_id=' . $_POST['exam_id'] . '&added=1');
+    exit;
+}
+$exam_id = $_GET['exam_id'] ?? 0;
+?&gt;
+&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;
+  &lt;title&gt;Add Question&lt;/title&gt;
+  &lt;link rel="stylesheet" href="../cbt-editor/cbt-editor.min.css"&gt;
+&lt;/head&gt;&lt;body&gt;
+&lt;h1&gt;📝 Add Exam Question&lt;/h1&gt;
+&lt;form method="POST"&gt;
+  &lt;input type="hidden" name="exam_id" value="&lt;?php echo $exam_id; ?&gt;"&gt;
+
+  &lt;label&gt;Instruction (plain text)&lt;/label&gt;
+  &lt;input type="text" name="instruction" placeholder="e.g. Choose the correct answer"&gt;
+
+  &lt;label&gt;Question (rich text + math + chemistry)&lt;/label&gt;
+  &lt;div id="question-editor"&gt;&lt;/div&gt;
+
+  &lt;label&gt;Option A&lt;/label&gt;
+  &lt;input type="text" name="option_a" required&gt;
+
+  &lt;label&gt;Option B&lt;/label&gt;
+  &lt;input type="text" name="option_b" required&gt;
+
+  &lt;label&gt;Option C&lt;/label&gt;
+  &lt;input type="text" name="option_c" required&gt;
+
+  &lt;label&gt;Option D&lt;/label&gt;
+  &lt;input type="text" name="option_d" required&gt;
+
+  &lt;label&gt;Correct Answer&lt;/label&gt;
+  &lt;select name="correct_answer"&gt;
+    &lt;option value="A"&gt;A&lt;/option&gt;&lt;option value="B"&gt;B&lt;/option&gt;
+    &lt;option value="C"&gt;C&lt;/option&gt;&lt;option value="D"&gt;D&lt;/option&gt;
+  &lt;/select&gt;
+
+  &lt;label&gt;Marks&lt;/label&gt;
+  &lt;input type="number" name="marks" value="1" min="1"&gt;
+
+  &lt;button type="submit"&gt;💾 Save Question&lt;/button&gt;
+&lt;/form&gt;
+
+&lt;script src="../cbt-editor/cbt-editor.min.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  CBTEditor.setMathLiveFontsDir('../cbt-editor/fonts');
+  new CBTEditor({
+    target: document.getElementById('question-editor'),
+    name: 'question'     // ← auto-syncs to hidden &lt;input name="question"&gt;
+  });
+&lt;/script&gt;
+&lt;/body&gt;&lt;/html&gt;</code></pre>
+
+    <h3>EDIT — Load Question Back for Editing</h3>
+    <p>Load the saved JSON into the editor using <code>value</code>. The math/chem blocks come back <strong>editable</strong>.</p>
+    <pre><code>&lt;?php
+// questions/edit.php?id=5
+require_once '../db.php';
+$id = $_GET['id'] ?? 0;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $stmt = $pdo->prepare(
+        'UPDATE exam_questions SET question=?, option_a=?, option_b=?, option_c=?,
+         option_d=?, correct_answer=?, marks=?, updated_at=NOW() WHERE id=?'
+    );
+    $stmt->execute([
+        $_POST['question'], $_POST['option_a'], $_POST['option_b'],
+        $_POST['option_c'], $_POST['option_d'], $_POST['correct_answer'],
+        $_POST['marks'] ?? 1, $id
+    ]);
+    header('Location: list.php?updated=1');
+    exit;
+}
+
+$stmt = $pdo->prepare('SELECT * FROM exam_questions WHERE id = ?');
+$stmt->execute([$id]);
+$q = $stmt->fetch();
+if (!$q) die('Question not found');
+
+$questionJSON = $q['question'];   // ← JSON string from DB
+?&gt;
+&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;
+  &lt;title&gt;Edit Question #&lt;?php echo $id; ?&gt;&lt;/title&gt;
+  &lt;link rel="stylesheet" href="../cbt-editor/cbt-editor.min.css"&gt;
+&lt;/head&gt;&lt;body&gt;
+&lt;h1&gt;✏️ Edit Question #&lt;?php echo $id; ?&gt;&lt;/h1&gt;
+&lt;form method="POST"&gt;
+
+  &lt;label&gt;Question&lt;/label&gt;
+  &lt;div id="question-editor"&gt;&lt;/div&gt;
+
+  &lt;label&gt;Option A&lt;/label&gt;
+  &lt;input type="text" name="option_a"
+         value="&lt;?php echo htmlspecialchars($q['option_a']); ?&gt;"&gt;
+
+  &lt;label&gt;Option B&lt;/label&gt;
+  &lt;input type="text" name="option_b"
+         value="&lt;?php echo htmlspecialchars($q['option_b']); ?&gt;"&gt;
+
+  &lt;label&gt;Option C&lt;/label&gt;
+  &lt;input type="text" name="option_c"
+         value="&lt;?php echo htmlspecialchars($q['option_c']); ?&gt;"&gt;
+
+  &lt;label&gt;Option D&lt;/label&gt;
+  &lt;input type="text" name="option_d"
+         value="&lt;?php echo htmlspecialchars($q['option_d']); ?&gt;"&gt;
+
+  &lt;label&gt;Correct Answer&lt;/label&gt;
+  &lt;select name="correct_answer"&gt;
+    &lt;?php foreach(['A','B','C','D'] as $opt): ?&gt;
+      &lt;option value="&lt;?php echo $opt; ?&gt;"
+              &lt;?php if($q['correct_answer']===$opt) echo 'selected'; ?&gt;&gt;
+        &lt;?php echo $opt; ?&gt;
+      &lt;/option&gt;
+    &lt;?php endforeach; ?&gt;
+  &lt;/select&gt;
+
+  &lt;button type="submit"&gt;💾 Save Changes&lt;/button&gt;
+&lt;/form&gt;
+
+&lt;script src="../cbt-editor/cbt-editor.min.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  CBTEditor.setMathLiveFontsDir('../cbt-editor/fonts');
+
+  const savedQuestion = &lt;?php echo $questionJSON; ?&gt;;
+
+  new CBTEditor({
+    target: document.getElementById('question-editor'),
+    name: 'question',          // auto-syncs JSON to hidden input
+    value: savedQuestion       // ← math/chem blocks come back EDITABLE
+  });
+&lt;/script&gt;
+&lt;/body&gt;&lt;/html&gt;</code></pre>
+
+    <h3>DISPLAY — Show Question as Readable HTML (Not JSON!)</h3>
+    <p>
+      This is the critical part. When showing questions to students, you use
+      <strong><code>getHTML()</code></strong> to render the document as formatted HTML —
+      not raw JSON. You can do this server-side (save HTML alongside JSON) or client-side.
+    </p>
+
+    <h4>Approach A: Save HTML at creation time (recommended)</h4>
+    <p>Add an <code>question_html</code> column to your table. Generate HTML when saving:</p>
+    <pre><code>// In your save handler (create.php or edit.php POST):
+$questionHTML = $editor->getHTML();  // ← client-side JS
+// Send both JSON and HTML to server
+// Or: generate HTML server-side if you have a ProseMirror PHP renderer</code></pre>
+
+    <h4>Approach B: Render on display page (simpler)</h4>
+    <p>On the exam page, load the JSON and render as HTML using a lightweight read-only editor:</p>
+    <pre><code>&lt;?php
+// exam/take.php — Student takes the exam
+$stmt = $pdo->prepare('SELECT * FROM exam_questions WHERE exam_id = ? ORDER BY id');
+$stmt->execute([$exam_id]);
+$questions = $stmt->fetchAll();
+?&gt;
+&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;
+  &lt;title&gt;Exam&lt;/title&gt;
+  &lt;link rel="stylesheet" href="../cbt-editor/cbt-editor.min.css"&gt;
+&lt;/head&gt;&lt;body&gt;
+&lt;form method="POST" action="submit.php"&gt;
+  &lt;?php foreach ($questions as $index => $q): ?&gt;
+    &lt;div class="question-card"&gt;
+      &lt;h3&gt;Question &lt;?php echo $index + 1; ?&gt;
+          (&lt;?php echo $q['marks']; ?&gt; mark&lt;?php echo $q['marks']>1?'s':''; ?&gt;)&lt;/h3&gt;
+
+      &lt;!-- Display the question as readable HTML --&gt;
+      &lt;div class="q-display" id="q-display-&lt;?php echo $q['id']; ?&gt;"&gt;&lt;/div&gt;
+
+      &lt;label&gt;&lt;input type="radio" name="answer[&lt;?php echo $q['id']; ?&gt;]" value="A"&gt;
+        A) &lt;?php echo htmlspecialchars($q['option_a']); ?&gt;&lt;/label&gt;&lt;br&gt;
+      &lt;label&gt;&lt;input type="radio" name="answer[&lt;?php echo $q['id']; ?&gt;]" value="B"&gt;
+        B) &lt;?php echo htmlspecialchars($q['option_b']); ?&gt;&lt;/label&gt;&lt;br&gt;
+      &lt;label&gt;&lt;input type="radio" name="answer[&lt;?php echo $q['id']; ?&gt;]" value="C"&gt;
+        C) &lt;?php echo htmlspecialchars($q['option_c']); ?&gt;&lt;/label&gt;&lt;br&gt;
+      &lt;label&gt;&lt;input type="radio" name="answer[&lt;?php echo $q['id']; ?&gt;]" value="D"&gt;
+        D) &lt;?php echo htmlspecialchars($q['option_d']); ?&gt;&lt;/label&gt;
+    &lt;/div&gt;
+  &lt;?php endforeach; ?&gt;
+  &lt;button type="submit"&gt;📤 Submit Exam&lt;/button&gt;
+&lt;/form&gt;
+
+&lt;script src="../cbt-editor/cbt-editor.min.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  CBTEditor.setMathLiveFontsDir('../cbt-editor/fonts');
+
+  // Render each question as readable HTML using getHTML()
+  &lt;?php foreach ($questions as $q): ?&gt;
+  (function() {
+    const savedQ = &lt;?php echo $q['question']; ?&gt;;
+    const editor = new CBTEditor({
+      target: document.getElementById('q-display-&lt;?php echo $q['id']; ?&gt;'),
+      value: savedQ,
+      readOnly: true         // ← students can't edit
+    });
+    // The editor renders the question as formatted HTML automatically.
+    // No JSON gibberish — students see proper headings, bold, italic,
+    // math equations, and chemistry formulas.
+  })();
+  &lt;?php endforeach; ?&gt;
+&lt;/script&gt;
+&lt;/body&gt;&lt;/html&gt;</code></pre>
+
+    <div class="callout tip">
+      <strong>✅ Display summary:</strong> Use <code>readOnly: true</code> when showing
+      questions to students. The editor renders the document as <strong>formatted HTML</strong>
+      with all math equations and chemistry formulas properly displayed. Students see
+      readable content — not JSON. The toolbar is still visible (for read-only viewing)
+      but editing is disabled.
+    </div>
+  </section>
+
+</main>
+
+<!-- ═══════════════════ SIDEBAR ACTIVE ═══════════════════ -->
+<script>
+  const navLinks = document.querySelectorAll('#sidebar-nav a');
+  const sections = document.querySelectorAll('main section[id]');
+  function updateActiveLink() {
+    let currentId = '';
+    sections.forEach(s => { if (s.offsetTop <= window.scrollY + 80) currentId = s.id; });
+    navLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + currentId));
+  }
+  window.addEventListener('scroll', updateActiveLink);
+  updateActiveLink();
+  navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      const href = link.getAttribute('href');
+      // Only intercept hash links (#section) — let page links navigate normally
+      if (!href || !href.startsWith('#')) return;
+      e.preventDefault();
+      const id = href.substring(1);
+      const target = document.getElementById(id);
+      if (target) { target.scrollIntoView({ behavior: 'smooth', block: 'start' }); history.replaceState(null, '', '#' + id); }
+    });
+  });
+  if (window.location.hash) {
+    setTimeout(() => {
+      const id = window.location.hash.substring(1);
+      const target = document.getElementById(id);
+      if (target) target.scrollIntoView({ block: 'start' });
+    }, 100);
+  }
+</script>
+</body>
+</html>

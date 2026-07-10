@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CBTEditor Docs — Free Math &amp; Chemistry Equation Editor for CBT Exams</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      line-height: 1.65;
+      display: flex;
+    }
+
+    /* ── Sidebar ──────────────────────────────────── */
+    .sidebar {
+      width: 260px;
+      min-width: 260px;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 24px 0;
+      overflow-y: auto;
+      font-size: 0.9rem;
+    }
+    .sidebar .brand {
+      padding: 0 20px 20px;
+      border-bottom: 1px solid #334155;
+      margin-bottom: 12px;
+    }
+    .sidebar .brand h2 { font-size: 1.2rem; color: #fff; }
+    .sidebar .brand a { color: #94a3b8; font-size: 0.8rem; text-decoration: none; }
+    .sidebar .brand a:hover { color: #fff; }
+
+    .sidebar nav a {
+      display: block;
+      padding: 8px 20px;
+      color: #cbd5e1;
+      text-decoration: none;
+      border-left: 3px solid transparent;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+      font-size: 0.88rem;
+    }
+    .sidebar nav a:hover { background: #334155; color: #fff; }
+    .sidebar nav a.active {
+      background: #334155;
+      color: #fff;
+      border-left-color: #3b82f6;
+      font-weight: 600;
+    }
+    .sidebar nav .section-title {
+      padding: 16px 20px 6px;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #64748b;
+      font-weight: 700;
+    }
+
+    /* ── Main content ─────────────────────────────── */
+    .main {
+      flex: 1;
+      min-width: 0;
+      padding: 40px 48px 80px;
+      max-width: 860px;
+    }
+    .main section { margin-bottom: 48px; }
+
+    .main h1 { font-size: 2rem; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
+    .main h2 { font-size: 1.4rem; font-weight: 700; color: #0f172a; margin: 28px 0 12px; padding-bottom: 6px; border-bottom: 1px solid #e2e8f0; }
+    .main h3 { font-size: 1.1rem; font-weight: 600; color: #1e293b; margin: 20px 0 8px; }
+    .main p { margin-bottom: 12px; }
+    .main ul, .main ol { margin: 8px 0 16px 20px; }
+    .main li { margin-bottom: 4px; }
+
+    .main a { color: #2563eb; text-decoration: none; }
+    .main a:hover { text-decoration: underline; }
+
+    .main strong { color: #0f172a; }
+    .main code {
+      background: #f1f5f9;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.88em;
+      color: #1e293b;
+    }
+    .main pre {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 16px 20px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.82rem;
+      line-height: 1.55;
+      margin: 12px 0 20px;
+    }
+    .main pre code {
+      background: none;
+      padding: 0;
+      color: inherit;
+      font-size: inherit;
+    }
+
+    .main table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 12px 0 20px;
+      font-size: 0.9rem;
+    }
+    .main table th, .main table td {
+      border: 1px solid #e2e8f0;
+      padding: 8px 12px;
+      text-align: left;
+    }
+    .main table th { background: #f8fafc; font-weight: 600; }
+    .main table tr:nth-child(even) td { background: #f8fafc; }
+
+    .main .callout {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin: 16px 0;
+      font-size: 0.9rem;
+    }
+    .main .callout.warn {
+      background: #fef3c7;
+      border-color: #fcd34d;
+    }
+
+    /* ── Mobile ───────────────────────────────────── */
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      .sidebar {
+        width: 100%; min-width: 100%; height: auto;
+        position: static; padding: 12px 0;
+      }
+      .sidebar nav { display: flex; flex-wrap: wrap; gap: 2px; padding: 0 12px; }
+      .sidebar nav .section-title { display: none; }
+      .sidebar nav a { border-left: none; border-radius: 4px; padding: 6px 12px; font-size: 0.8rem; }
+      .sidebar .brand { padding: 0 12px 10px; }
+      .main { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SIDEBAR                                                       -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<aside class="sidebar">
+  <div class="brand">
+    <h2>🧪 CBTEditor</h2>
+    <a href="index.html">← Back to Home</a>
+  </div>
+  <nav id="sidebar-nav">
+    <span class="section-title">Getting Started</span>
+    <a href="#overview">Overview</a>
+    <a href="#quick-start">Quick Start</a>
+    <a href="#installation">Installation</a>
+    <a href="demo.html">🎮 Live Demo</a>
+    <a href="php-crud.html">PHP CRUD Guide</a>
+
+    <span class="section-title">API</span>
+    <a href="#usage">Usage &amp; API</a>
+    <a href="#export-import">Export &amp; Import</a>
+
+    <span class="section-title">Internals</span>
+    <a href="#architecture">Architecture</a>
+    <a href="#extending">Extending</a>
+
+    <span class="section-title">Maintenance</span>
+    <a href="#updating">Updating</a>
+    <a href="#contributing">Contributing</a>
+  </nav>
+</aside>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- MAIN CONTENT                                                  -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<main class="main">
+
+  <!-- ── OVERVIEW ──────────────────────────────────────────── -->
+  <section id="overview">
+    <h1>📚 CBTEditor Documentation</h1>
+    <p>
+      CBTEditor is a <strong>free, open-source</strong> (MIT) WYSIWYG editor with
+      visual math and chemistry editing. Built on <strong>TipTap</strong> (ProseMirror) +
+      <strong>MathLive</strong>. No framework required — drop a <code>&lt;script&gt;</code>
+      tag into any HTML page, PHP template, or CMS.
+    </p>
+
+    <h3>Features</h3>
+    <ul>
+      <li><strong>Rich text</strong> — headings (H1–H3), bold, italic, bullet/numbered lists, tables</li>
+      <li><strong>Visual math</strong> (📐) — tap-to-build equations using MathLive — fractions, superscripts, symbols, no LaTeX typing required</li>
+      <li><strong>Visual chemistry</strong> (⚗️) — click-to-build formulas — subscripts, charges, reaction arrows</li>
+      <li><strong>Save/Load</strong> — documents stored as JSON, fully serializable</li>
+      <li><strong>Export</strong> — HTML, LaTeX (math), structured JSON (chemistry)</li>
+      <li><strong>Undo/Redo</strong> — full history support</li>
+      <li><strong>Framework-agnostic</strong> — one <code>.js</code> file, one <code>.css</code> file, works anywhere</li>
+    </ul>
+
+    <div class="callout">
+      <strong>💡 What's in the box?</strong> <code>cbt-editor.min.js</code> (~1.1 MB),
+      <code>cbt-editor.min.css</code> (~6 KB), and a <code>fonts/</code> directory for
+      MathLive's KaTeX math fonts (~2 MB). That's it.
+    </div>
+  </section>
+
+  <!-- ── QUICK START ───────────────────────────────────────── -->
+  <section id="quick-start">
+    <h2>Quick Start</h2>
+
+    <h3>Option A: Plain <code>&lt;script&gt;</code> tag (no build tools)</h3>
+    <p>Copy three things into your project and add 5 lines of HTML:</p>
+    <pre><code>&lt;link rel="stylesheet" href="cbt-editor.min.css"&gt;
+&lt;script src="cbt-editor.min.js"&gt;&lt;/script&gt;
+&lt;div id="editor"&gt;&lt;/div&gt;
+&lt;script&gt;
+  CBTEditor.setMathLiveFontsDir('./fonts');
+  const editor = new CBTEditor({ target: document.getElementById('editor') });
+&lt;/script&gt;</code></pre>
+    <p>Works in plain HTML, PHP, WordPress, any CMS. <strong>Zero build step.</strong></p>
+
+    <h3>Option B: npm (if you use a bundler)</h3>
+    <pre><code>npm install cbt-editor</code></pre>
+    <pre><code>import CBTEditor from 'cbt-editor';
+const editor = new CBTEditor({ target: document.getElementById('editor') });</code></pre>
+  </section>
+
+  <!-- ── INSTALLATION ──────────────────────────────────────── -->
+  <section id="installation">
+    <h2>Installation</h2>
+
+    <h3>Option A: Plain <code>&lt;script&gt;</code> tag — No build tools</h3>
+    <p>This is the primary path. Copy these into your project:</p>
+    <pre><code>your-project/
+├── cbt-editor.min.js    ← the editor bundle
+├── cbt-editor.min.css   ← styles
+└── fonts/               ← MathLive math fonts (required for rendering)</code></pre>
+    <p>Then in any HTML or PHP page:</p>
+    <pre><code>&lt;link rel="stylesheet" href="cbt-editor.min.css"&gt;
+&lt;script src="cbt-editor.min.js"&gt;&lt;/script&gt;
+&lt;div id="editor"&gt;&lt;/div&gt;
+&lt;script&gt;
+  CBTEditor.setMathLiveFontsDir('./fonts');
+  new CBTEditor({ target: document.getElementById('editor') });
+&lt;/script&gt;</code></pre>
+
+    <h4>Using in PHP / WordPress</h4>
+    <pre><code>&lt;link rel="stylesheet"
+      href="&lt;?php echo get_template_directory_uri(); ?&gt;/cbt-editor/cbt-editor.min.css"&gt;
+&lt;script src="&lt;?php echo get_template_directory_uri(); ?&gt;/cbt-editor/cbt-editor.min.js"&gt;&lt;/script&gt;
+
+&lt;div id="my-editor"&gt;&lt;/div&gt;
+&lt;script&gt;
+CBTEditor.setMathLiveFontsDir(
+  '&lt;?php echo get_template_directory_uri(); ?&gt;/cbt-editor/fonts'
+);
+new CBTEditor({ target: document.getElementById('my-editor') });
+&lt;/script&gt;</code></pre>
+
+    <h3>Option B: npm + bundler</h3>
+    <pre><code>npm install cbt-editor</code></pre>
+    <pre><code>import CBTEditor from 'cbt-editor';
+import 'cbt-editor/dist/cbt-editor.min.css';
+
+const editor = new CBTEditor({
+  target: document.getElementById('editor')
+});</code></pre>
+    <p>Note: even with npm, you still need the <code>fonts/</code> directory accessible at a URL. Copy it from <code>node_modules/cbt-editor/dist/fonts/</code> to your public folder.</p>
+  </section>
+
+  <!-- ── USAGE ─────────────────────────────────────────────── -->
+  <section id="usage">
+    <h2>Usage &amp; API Reference</h2>
+
+    <h3>Creating an Editor</h3>
+    <pre><code>const editor = new CBTEditor({
+  target: document.getElementById('editor'),  // REQUIRED
+  initialContent: myDocumentJSON,              // optional
+  onSave: (json) => { /* handle save */ },     // optional
+  readOnly: false                              // optional
+});</code></pre>
+
+    <h3>Options</h3>
+    <table>
+      <tr><th>Option</th><th>Type</th><th>Default</th><th>Description</th></tr>
+      <tr><td><code>target</code></td><td><code>HTMLElement</code></td><td><em>required</em></td><td>The DOM element to mount the editor into</td></tr>
+      <tr><td><code>initialContent</code></td><td><code>Object</code></td><td><code>null</code></td><td>A TipTap-compatible JSON document to load on init</td></tr>
+      <tr><td><code>onSave</code></td><td><code>Function</code></td><td><code>null</code></td><td>Called with document JSON when user clicks Save</td></tr>
+      <tr><td><code>readOnly</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Whether the editor is read-only</td></tr>
+    </table>
+
+    <h3>Methods</h3>
+
+    <p><strong><code>editor.getJSON()</code></strong> — Returns the full document as a TipTap-compatible JSON object.</p>
+    <pre><code>const doc = editor.getJSON();</code></pre>
+
+    <p><strong><code>editor.getHTML()</code></strong> — Returns the document as an HTML string.</p>
+    <pre><code>const html = editor.getHTML();</code></pre>
+
+    <p><strong><code>editor.loadJSON(json)</code></strong> — Loads a document from JSON (replaces current content).</p>
+    <pre><code>editor.loadJSON(savedDocument);</code></pre>
+
+    <p><strong><code>editor.setReadOnly(bool)</code></strong> — Toggles read-only mode.</p>
+    <pre><code>editor.setReadOnly(true);  // disable editing
+editor.setReadOnly(false); // enable editing</code></pre>
+
+    <p><strong><code>editor.destroy()</code></strong> — Destroys the editor and cleans up the DOM.</p>
+    <pre><code>editor.destroy();</code></pre>
+
+    <p><strong><code>editor.on(event, callback)</code></strong> — Register an event listener (supports <code>'save'</code>).</p>
+    <pre><code>editor.on('save', (json) => {
+  fetch('/api/documents', { method: 'POST', body: JSON.stringify(json) });
+});</code></pre>
+
+    <h3>Static Method</h3>
+    <p><strong><code>CBTEditor.setMathLiveFontsDir(dir)</code></strong> — Sets the directory where MathLive looks for its KaTeX font files. Call once before creating any editor.</p>
+    <pre><code>CBTEditor.setMathLiveFontsDir('./dist/fonts');</code></pre>
+  </section>
+
+  <!-- ── EXPORT / IMPORT ───────────────────────────────────── -->
+  <section id="export-import">
+    <h2>Export &amp; Import</h2>
+
+    <h3><code>editor.exportToHTML()</code></h3>
+    <p>Returns the document as an HTML string, suitable for PDF generation or web display.</p>
+    <pre><code>const html = editor.exportToHTML();</code></pre>
+
+    <h3><code>editor.exportMathAsLatex()</code></h3>
+    <p>Extracts LaTeX strings from all MathBlocks in the document. Returns an array of <code>{ latex: string }</code> objects.</p>
+    <pre><code>const mathBlocks = editor.exportMathAsLatex();
+// [{ latex: "x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}" }]
+mathBlocks.forEach(m => console.log(m.latex));</code></pre>
+
+    <h3><code>editor.exportChemAsJSON()</code></h3>
+    <p>Extracts the chemistry formula tree from all ChemBlocks. Returns an array of parsed formula objects.</p>
+    <pre><code>const chemBlocks = editor.exportChemAsJSON();
+// [{ terms: [{ coefficient: 2, groups: [...] }, ...] }]
+chemBlocks.forEach(c => console.log(c.terms));</code></pre>
+
+    <h3><code>editor.importFromJSON(json)</code></h3>
+    <p>Imports a document from saved JSON. Validates the document has a <code>type</code> field. Returns <code>true</code> on success.</p>
+    <pre><code>const ok = editor.importFromJSON(savedDocument);
+if (!ok) console.error('Invalid document format');</code></pre>
+
+    <div class="callout warn">
+      <strong>⚠️ Critical guarantee:</strong> <code>importFromJSON()</code> (and passing <code>initialContent</code>)
+      reconstructs the full ProseMirror document tree. Math blocks and chemistry blocks
+      reappear as <strong>fully editable interactive blocks</strong> — never flattened to static
+      text or images. As long as the JSON includes the correct <code>"type": "mathBlock"</code>
+      / <code>"type": "chemBlock"</code> node types with their attributes intact, the blocks
+      will be click-to-edit.
+    </div>
+
+    <h3>Edit / Update Pattern (full lifecycle)</h3>
+    <p>This is the most common pattern: load a saved document, edit it, save back:</p>
+    <pre><code>// 1. Fetch saved document from your backend
+const response = await fetch('/api/documents/123');
+const savedDoc = await response.json();
+
+// 2. Load it into the editor (math & chem blocks are EDITABLE)
+const editor = new CBTEditor({
+  target: document.getElementById('editor'),
+  initialContent: savedDoc
+});
+
+// 3. User edits... then saves
+editor.on('save', async (updatedJson) => {
+  await fetch('/api/documents/123', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ document: updatedJson })
+  });
+  console.log('✅ Saved!');
+});</code></pre>
+
+    <h3>Round-Trip Test</h3>
+    <pre><code>// Confidence check: save, clear, reload, verify blocks still editable
+const saved = editor.getJSON();
+editor.loadJSON({ type: 'doc', content: [] });        // clear
+editor.importFromJSON(saved);                          // reload
+
+const math = editor.exportMathAsLatex();
+const chem = editor.exportChemAsJSON();
+console.assert(math.length > 0, 'Math blocks survived');
+console.assert(chem.length > 0, 'Chem blocks survived');
+console.log('✅ Round-trip passed');</code></pre>
+  </section>
+
+  <!-- ── ARCHITECTURE ──────────────────────────────────────── -->
+  <section id="architecture">
+    <h2>Architecture</h2>
+    <p>CBTEditor is built in three independent layers, following a shell + plugins pattern:</p>
+    <pre><code>CBTEditor (public API)
+│
+├── Shell: TipTap (ProseMirror)          ← document model, toolbar, formatting
+│     MIT license
+│
+├── Custom Node: MathBlock               ← visual math editing
+│     wraps MathLive (&lt;math-field&gt;)       ← MIT license
+│     stores content as LaTeX string
+│
+└── Custom Node: ChemBlock               ← visual chemistry formula editing
+      custom tree-based model
+      stores formula tree as JSON string</code></pre>
+
+    <h3>1. Shell (TipTap)</h3>
+    <p>TipTap (built on ProseMirror) handles the hard parts: document model, state management, selection/cursor, keyboard handling, undo/redo history, JSON/HTML serialization, table editing, and an extension system. We use <strong><code>@tiptap/core</code></strong> directly — not <code>@tiptap/react</code> — to keep the package framework-agnostic. The toolbar is built with plain DOM elements.</p>
+
+    <h3>2. MathBlock</h3>
+    <p>A custom TipTap <strong>Node</strong> that uses the <strong>NodeView</strong> API to render a MathLive <code>&lt;math-field&gt;</code> web component at the node's position in the document. LaTeX is stored as a node attribute (<code>attrs.latex</code>). Clicking the display toggles the math-field into edit mode. MathLive provides visual fraction/superscript/subscript editing, tap-to-build virtual keyboard, and LaTeX/MathJSON import/export.</p>
+
+    <h3>3. ChemBlock</h3>
+    <p>A custom TipTap <strong>Node</strong> with its own visual editor built in plain HTML/CSS. The formula is stored as a JSON tree in <code>attrs.formula</code>:</p>
+    <pre><code>{
+  "terms": [
+    { "coefficient": 2, "groups": [
+        { "symbol": "H", "subscript": "2", "superscript": "" }
+    ]},
+    { "operator": "+" },
+    { "coefficient": 1, "groups": [
+        { "symbol": "O", "subscript": "2", "superscript": "" }
+    ]},
+    { "operator": "→" },
+    { "coefficient": 2, "groups": [
+        { "symbol": "H", "subscript": "2", "superscript": "" },
+        { "symbol": "O", "subscript": "1", "superscript": "" }
+    ]}
+  ]
+}</code></pre>
+  </section>
+
+  <!-- ── EXTENDING ─────────────────────────────────────────── -->
+  <section id="extending">
+    <h2>Extending with Custom Nodes</h2>
+
+    <p>Follow this pattern to add a new block type (e.g. <code>GraphBlock</code>, <code>CodeBlock</code>, <code>DiagramBlock</code>):</p>
+
+    <h3>Step 1: Create the Node file</h3>
+    <p>Create <code>src/nodes/GraphBlock.js</code>:</p>
+    <pre><code>import { Node } from '@tiptap/core';
+
+const GraphBlock = Node.create({
+  name: 'graphBlock',        // Must be unique
+  group: 'block',
+  atom: true,                // Atomic unit (no nested text editing)
+  inline: false,
+  draggable: true,
+
+  addAttributes() {
+    return {
+      data: {
+        default: '{}',
+        parseHTML: (el) => el.getAttribute('data-graph') || '{}',
+        renderHTML: (attrs) => ({ 'data-graph': attrs.data }),
+      },
+    };
+  },
+
+  parseHTML() {
+    return [{ tag: 'div[data-graph-block]' }];
+  },
+
+  renderHTML({ node }) {
+    return ['div', {
+      'data-graph-block': '',
+      'data-graph': node.attrs.data,
+      class: 'cbt-graph-block',
+    }, ['span', {}, '📊 Graph']];
+  },
+
+  addNodeView() {
+    return ({ node, getPos, editor }) => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'cbt-graph-block';
+      wrapper.setAttribute('data-graph-block', '');
+      wrapper.contentEditable = 'false';  // ← IMPORTANT
+
+      // Build your custom UI here...
+      const canvas = document.createElement('canvas');
+      canvas.width = 400; canvas.height = 200;
+      wrapper.appendChild(canvas);
+
+      return {
+        dom: wrapper,
+        update(updatedNode) {
+          if (updatedNode.attrs.data !== node.attrs.data) {
+            // Re-render
+          }
+          return true;
+        },
+        ignoreMutation(mutation) {
+          return wrapper.contains(mutation.target);
+        },
+      };
+    };
+  },
+});</code></pre>
+
+    <h3>Step 2: Register in CBTEditor.js</h3>
+    <pre><code>import GraphBlock from './nodes/GraphBlock.js';
+
+// Inside _createTipTapEditor():
+extensions: [
+  StarterKit.configure({ heading: { levels: [1, 2, 3] } }),
+  Table.configure({ resizable: true }),
+  TableRow, TableCell, TableHeader,
+  MathBlock,
+  ChemBlock,
+  GraphBlock,  // ← add here
+],</code></pre>
+
+    <h3>Step 3: Add Toolbar Button</h3>
+    <p>In <code>_toolbarHTML()</code>, add your button with <code>data-action="insertGraphBlock"</code>, then handle it in <code>_bindToolbarEvents()</code>:</p>
+    <pre><code>case 'insertGraphBlock':
+  this._editor.chain().focus().insertContent({
+    type: 'graphBlock', attrs: { data: '{}' }
+  }).run();
+  break;</code></pre>
+
+    <h3>Step 4: Test Round-Tripping</h3>
+    <pre><code>editor.getJSON();   // → should include your graphBlock
+editor.importFromJSON(savedJson);  // → should reconstruct it as editable</code></pre>
+
+    <p>The key rules:</p>
+    <ul>
+      <li>Always set <strong><code>wrapper.contentEditable = 'false'</code></strong> in your NodeView</li>
+      <li>Store all data in <strong>node attributes</strong> (they serialize to JSON automatically)</li>
+      <li>Use <strong><code>ignoreMutation</code></strong> to tell ProseMirror your DOM is externally managed</li>
+      <li>Use <strong><code>editor.view.dispatch(editor.state.tr.setNodeAttribute(pos, ...))</code></strong> to update attributes from your editor</li>
+    </ul>
+  </section>
+
+  <!-- ── UPDATING ──────────────────────────────────────────── -->
+  <section id="updating">
+    <h2>Updating CBTEditor</h2>
+
+    <h3>Versioning</h3>
+    <p>CBTEditor follows <strong>Semantic Versioning</strong> (MAJOR.MINOR.PATCH):</p>
+    <ul>
+      <li><strong>MAJOR</strong>: Breaking changes to the public API or document format</li>
+      <li><strong>MINOR</strong>: New features — backward compatible</li>
+      <li><strong>PATCH</strong>: Bug fixes — fully backward compatible</li>
+    </ul>
+
+    <div class="callout warn">
+      <strong>⚠️ Most important step before releasing:</strong> Test that old saved documents still load correctly. Users have documents built with previous versions. After ANY change to how math or chemistry content is stored, verify old documents open correctly.
+    </div>
+
+    <h3>Release Checklist</h3>
+    <ol>
+      <li><strong>Test backward compatibility</strong> — load an old document, save it, reload it. Verify math/chem blocks are still editable.</li>
+      <li><strong>Check the public API</strong> — all documented methods still work</li>
+      <li><strong>Test both distribution paths</strong> — UMD (script tag) and npm (ESM import)</li>
+      <li><strong>Build and check sizes</strong> — <code>npm run build</code></li>
+      <li><strong>Update CHANGELOG.md</strong></li>
+      <li><strong>Bump version in package.json</strong></li>
+      <li><strong>Run <code>bash build-release.sh</code></strong></li>
+      <li><strong>Upload</strong> <code>public-release/</code> to your hosting</li>
+      <li><strong>Tag the release</strong> in git: <code>git tag v1.2.0 && git push --tags</code></li>
+    </ol>
+
+    <h3>Backward Compatibility Test Script</h3>
+    <pre><code>const oldDoc = { /* JSON from a previous version */ };
+editor.importFromJSON(oldDoc);
+
+const mathBlocks = editor.exportMathAsLatex();
+console.assert(mathBlocks.length > 0, 'Math blocks should survive');
+
+const chemBlocks = editor.exportChemAsJSON();
+console.assert(chemBlocks.length > 0, 'Chem blocks should survive');
+
+const saved = editor.getJSON();
+const reloaded = editor.importFromJSON(saved);
+console.assert(reloaded, 'Round-trip should succeed');</code></pre>
+  </section>
+
+  <!-- ── CONTRIBUTING ──────────────────────────────────────── -->
+  <section id="contributing">
+    <h2>Contributing</h2>
+
+    <h3>Getting Started</h3>
+    <pre><code>git clone &lt;repo-url&gt;
+cd cbt-editor
+npm install
+npm run build
+open test/index.html    # verify it works</code></pre>
+
+    <h3>Development Workflow</h3>
+    <ol>
+      <li>Make changes in <code>src/</code></li>
+      <li>Rebuild: <code>npm run build</code></li>
+      <li>Test by opening <code>test/index.html</code> in a browser</li>
+      <li>Check browser console for errors</li>
+    </ol>
+
+    <h3>Coding Style</h3>
+    <ul>
+      <li><strong>Vanilla JavaScript</strong> (ES modules). No TypeScript, no React, no JSX.</li>
+      <li>Use <code>class</code> syntax for components, factory functions for TipTap nodes.</li>
+      <li>CSS uses the <code>cbt-</code> prefix for all class names.</li>
+      <li>DOM manipulation uses native APIs — no jQuery.</li>
+      <li>NodeViews follow the MathBlock/ChemBlock pattern (see <a href="#extending">Extending</a>).</li>
+    </ul>
+
+    <h3>Before Submitting</h3>
+    <ul>
+      <li>✅ <code>npm run build</code> succeeds</li>
+      <li>✅ <code>test/index.html</code> works in a browser</li>
+      <li>✅ Math blocks insert, edit, and save correctly</li>
+      <li>✅ Chemistry blocks insert, edit, and save correctly</li>
+      <li>✅ Export methods return expected results</li>
+      <li>✅ Round-trip test passes (save → clear → reload → content intact)</li>
+      <li>✅ No new console errors</li>
+    </ul>
+
+    <h3>License</h3>
+    <p>By contributing, you agree that your contributions will be licensed under the MIT License.</p>
+  </section>
+
+</main>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SIDEBAR ACTIVE STATE SCRIPT                                    -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<script>
+  // Highlight the current section in the sidebar
+  const navLinks = document.querySelectorAll('#sidebar-nav a');
+  const sections = document.querySelectorAll('main section[id]');
+
+  function updateActiveLink() {
+    let currentId = '';
+    const scrollY = window.scrollY + 80;
+
+    sections.forEach(section => {
+      if (section.offsetTop <= scrollY) {
+        currentId = section.id;
+      }
+    });
+
+    navLinks.forEach(link => {
+      link.classList.toggle('active', link.getAttribute('href') === '#' + currentId);
+    });
+  }
+
+  window.addEventListener('scroll', updateActiveLink);
+  updateActiveLink();
+
+  // Smooth scroll for sidebar links (hash links only — page links navigate normally)
+  navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      const href = link.getAttribute('href');
+      if (!href || !href.startsWith('#')) return;  // let page links navigate
+      e.preventDefault();
+      const id = href.substring(1);
+      const target = document.getElementById(id);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        history.replaceState(null, '', '#' + id);
+      }
+    });
+  });
+
+  // Handle hash on page load
+  if (window.location.hash) {
+    setTimeout(() => {
+      const id = window.location.hash.substring(1);
+      const target = document.getElementById(id);
+      if (target) target.scrollIntoView({ block: 'start' });
+    }, 100);
+  }
+</script>
+
+</body>
+</html>

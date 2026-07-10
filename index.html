@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free CBT Equation Editor — Math &amp; Chemistry Formula Editor for Exams</title>
+  <meta name="description" content="Free, open-source math equation editor and chemistry formula editor for CBT platforms, JAMB exams, and e-learning. No LaTeX typing required — visual tap-to-build math and chemistry. Drop-in replacement for TinyMCE math plugin or CKEditor chemistry plugin. Works in any HTML page, PHP, or WordPress.">
+  <meta name="keywords" content="free CBT equation editor, math editor for CBT, JAMB CBT equation editor, LaTeX editor for exams, TinyMCE math plugin free, CKEditor chemistry plugin, chemistry formula editor, visual math editor, WYSIWYG math editor, exam question editor, e-learning equation editor">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://cbt-editor.com/">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      line-height: 1.6;
+    }
+    .container { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
+    header {
+      text-align: center;
+      padding: 60px 0 40px;
+    }
+    header h1 {
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 12px;
+    }
+    header .tagline {
+      font-size: 1.1rem;
+      color: #64748b;
+      max-width: 560px;
+      margin: 0 auto;
+    }
+    .badges {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .badge-free { background: #dcfce7; color: #166534; }
+    .badge-mit { background: #dbeafe; color: #1e40af; }
+    .badge-vanilla { background: #fef3c7; color: #92400e; }
+    .cta {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 32px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-block;
+      padding: 14px 32px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    .btn-primary { background: #2563eb; color: #fff; }
+    .btn-secondary { background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; }
+    section {
+      margin-top: 48px;
+    }
+    section h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: #0f172a;
+    }
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .feature-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 20px;
+    }
+    .feature-card h3 { font-size: 1.05rem; margin-bottom: 6px; }
+    .feature-card p { font-size: 0.9rem; color: #64748b; }
+    pre {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 16px 20px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      margin: 12px 0;
+    }
+    code { font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; }
+    .inline-code {
+      background: #f1f5f9;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    .docs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 8px;
+    }
+    .docs-grid a {
+      display: block;
+      padding: 10px 14px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      text-decoration: none;
+      color: #2563eb;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+    .docs-grid a:hover { background: #eff6ff; }
+    footer {
+      text-align: center;
+      padding: 40px 0;
+      color: #94a3b8;
+      font-size: 0.85rem;
+      margin-top: 48px;
+      border-top: 1px solid #e2e8f0;
+    }
+    footer a { color: #64748b; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <header>
+    <h1>🧪 Free CBT Equation Editor</h1>
+    <p class="tagline">
+      A <strong>free math editor for CBT</strong> platforms, JAMB exams, and e-learning.
+      Visual tap-to-build <strong>math equations</strong> and <strong>chemistry formulas</strong> —
+      no LaTeX typing required. Drop it into any HTML page, PHP template, or CMS
+      with a single <code class="inline-code">&lt;script&gt;</code> tag.
+      Free alternative to TinyMCE math plugin and CKEditor chemistry plugin.
+    </p>
+    <div class="badges">
+      <span class="badge badge-free">💰 $0 — Free Forever</span>
+      <span class="badge badge-mit">📜 MIT License</span>
+      <span class="badge badge-vanilla">⚡ Vanilla JS (No React)</span>
+    </div>
+    <div class="cta">
+      <a class="btn btn-primary" href="cbt-editor-v0.1.0.zip" download>⬇ Download ZIP (v0.1.0)</a>
+      <a class="btn btn-secondary" href="demo.html">🎮 Live Demo</a>
+    </div>
+  </header>
+
+  <section>
+    <h2>✨ Features</h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h3>� Visual Math Editor for Exams</h3>
+        <p>Tap-to-build fractions, exponents, radicals, and symbols. A <strong>free LaTeX editor for exams</strong> — students and teachers never type LaTeX. Powered by MathLive.</p>
+      </div>
+      <div class="feature-card">
+        <h3>⚗️ Chemistry Formula Editor</h3>
+        <p>Click-to-build chemical formulas with subscripts, charges, coefficients, and reaction arrows. A <strong>free CKEditor chemistry plugin</strong> alternative.</p>
+      </div>
+      <div class="feature-card">
+        <h3>📝 CBT Exam Question Editor</h3>
+        <p>Built for <strong>JAMB CBT</strong>, WAEC, NECO, and any e-learning platform. Create exam questions with embedded math equations and chemical formulas.</p>
+      </div>
+      <div class="feature-card">
+        <h3>🔄 TinyMCE Alternative</h3>
+        <p>A <strong>free TinyMCE math plugin</strong> replacement. No API keys, no subscriptions, no vendor lock-in. MIT licensed — use it anywhere, forever free.</p>
+      </div>
+      <div class="feature-card">
+        <h3>💾 JSON Document Storage</h3>
+        <p>Save &amp; load exam questions as JSON. Math stored as LaTeX, chemistry as structured trees. Export to HTML for displaying questions to students.</p>
+      </div>
+      <div class="feature-card">
+        <h3>🌐 Works in Any Platform</h3>
+        <p>Plain HTML, PHP, WordPress, Moodle, any CMS. Embed in JAMB CBT software, WAEC exam portals, or custom e-learning apps. One script tag — done.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>⚡ Why Choose CBTEditor Over Other Editors?</h2>
+    <table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
+      <tr style="border-bottom:1px solid #e2e8f0;">
+        <th style="text-align:left;padding:8px;">Feature</th>
+        <th style="text-align:center;padding:8px;">CBTEditor</th>
+        <th style="text-align:center;padding:8px;">TinyMCE</th>
+        <th style="text-align:center;padding:8px;">CKEditor</th>
+      </tr>
+      <tr style="border-bottom:1px solid #e2e8f0;">
+        <td style="padding:8px;">Visual math (no LaTeX)</td>
+        <td style="text-align:center;color:#16a34a;">✅ Free</td>
+        <td style="text-align:center;color:#dc2626;">💰 Paid plugin</td>
+        <td style="text-align:center;color:#dc2626;">💰 Paid plugin</td>
+      </tr>
+      <tr style="border-bottom:1px solid #e2e8f0;">
+        <td style="padding:8px;">Chemistry formula editor</td>
+        <td style="text-align:center;color:#16a34a;">✅ Free</td>
+        <td style="text-align:center;color:#dc2626;">❌ None</td>
+        <td style="text-align:center;color:#dc2626;">💰 Paid plugin</td>
+      </tr>
+      <tr style="border-bottom:1px solid #e2e8f0;">
+        <td style="padding:8px;">License</td>
+        <td style="text-align:center;color:#16a34a;">MIT (Free)</td>
+        <td style="text-align:center;color:#dc2626;">Commercial</td>
+        <td style="text-align:center;color:#2563eb;">GPL/Commercial</td>
+      </tr>
+      <tr style="border-bottom:1px solid #e2e8f0;">
+        <td style="padding:8px;">Framework required</td>
+        <td style="text-align:center;color:#16a34a;">None</td>
+        <td style="text-align:center;color:#dc2626;">None</td>
+        <td style="text-align:center;color:#dc2626;">None</td>
+      </tr>
+      <tr>
+        <td style="padding:8px;">Drop-in form input</td>
+        <td style="text-align:center;color:#16a34a;">✅ Built-in</td>
+        <td style="text-align:center;color:#dc2626;">Manual</td>
+        <td style="text-align:center;color:#dc2626;">Manual</td>
+      </tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>🚀 Quick Start</h2>
+    <p><strong>Option A — Plain <code class="inline-code">&lt;script&gt;</code> tag</strong> (no build tools):</p>
+    <pre><code>&lt;form method="POST" action="/save"&gt;
+  &lt;input name="title" placeholder="Title"&gt;
+  &lt;div id="editor"&gt;&lt;/div&gt;
+  &lt;button type="submit"&gt;Submit&lt;/button&gt;
+&lt;/form&gt;
+
+&lt;link rel="stylesheet" href="cbt-editor.min.css"&gt;
+&lt;script src="cbt-editor.min.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  CBTEditor.setMathLiveFontsDir('./fonts');
+  new CBTEditor({
+    target: document.getElementById('editor'),
+    name: 'content'   // &larr; auto-syncs JSON to hidden input
+  });
+&lt;/script&gt;</code></pre>
+
+    <p style="margin-top: 16px;"><strong>Option B — npm</strong> (for bundler-based projects):</p>
+    <pre><code>npm install cbt-editor</code></pre>
+  </section>
+
+  <section>
+    <h2>📚 Documentation</h2>
+    <p style="margin-bottom:12px;">
+      <a href="docs.html" style="color:#2563eb; font-weight:600;">→ Open Full Documentation Hub</a>
+      — all docs in one navigable page with sidebar.
+    </p>
+    <div class="docs-grid">
+      <a href="demo.html">🎮 Live Demo</a>
+      <a href="docs.html#overview">Overview</a>
+      <a href="docs.html#installation">Installation</a>
+      <a href="docs.html#usage">Usage &amp; API</a>
+      <a href="docs.html#export-import">Export &amp; Import</a>
+      <a href="php-crud.html">🐘 PHP CRUD Guide</a>
+      <a href="docs.html#architecture">Architecture</a>
+      <a href="docs.html#extending">Extending</a>
+      <a href="docs.html#updating">Updating</a>
+      <a href="docs.html#contributing">Contributing</a>
+    </div>
+  </section>
+
+  <section>
+    <h2>📦 What's in the ZIP?</h2>
+    <pre><code>cbt-editor-v0.1.0/
+├── cbt-editor.min.js      ← The editor (UMD, self-contained)
+├── cbt-editor.min.css     ← Styles
+├── fonts/                 ← MathLive math fonts
+├── README.md
+├── CHANGELOG.md
+├── LICENSE
+└── docs/
+    ├── INSTALLATION.md
+    ├── USAGE.md
+    ├── ARCHITECTURE.md
+    ├── EXTENDING.md
+    ├── UPDATING.md
+    └── CONTRIBUTING.md</code></pre>
+  </section>
+
+  <section>
+    <h2>🔧 Using in PHP / WordPress</h2>
+    <p>Same snippet — just drop it into any PHP template. The editor auto-syncs to a hidden input, so your existing form submission works unchanged:</p>
+    <pre><code>&lt;?php // In your PHP page or WordPress template ?&gt;
+&lt;link rel="stylesheet" href="&lt;?php echo get_template_directory_uri(); ?&gt;/cbt-editor.min.css"&gt;
+&lt;script src="&lt;?php echo get_template_directory_uri(); ?&gt;/cbt-editor.min.js"&gt;&lt;/script&gt;
+
+&lt;form method="POST"&gt;
+  &lt;input name="title" placeholder="Title"&gt;
+  &lt;div id="editor"&gt;&lt;/div&gt;
+  &lt;button type="submit"&gt;Submit&lt;/button&gt;
+&lt;/form&gt;
+
+&lt;script&gt;
+  CBTEditor.setMathLiveFontsDir('&lt;?php echo get_template_directory_uri(); ?&gt;/fonts');
+  new CBTEditor({
+    target: document.getElementById('editor'),
+    name: 'content'
+  });
+&lt;/script&gt;
+
+&lt;?php
+// On form submit, $_POST['content'] contains the full document JSON.
+// Store it directly in your database.
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $title   = $_POST['title'];
+    $content = $_POST['content'];  // JSON — store as-is
+    // $db->query("INSERT INTO documents (title, content) VALUES (?, ?)", [$title, $content]);
+}
+?&gt;</code></pre>
+  </section>
+
+  <footer>
+    <p>
+      CBTEditor v0.1.0 — MIT License — Built with
+      Built with <a href="https://tiptap.dev/" target="_blank" rel="noopener">TipTap</a> +
+      <a href="https://mathlive.io/" target="_blank" rel="noopener">MathLive</a>
+    </p>
+  </footer>
+
+</div>
+
+</body>
+</html>
