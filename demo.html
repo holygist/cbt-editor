@@ -113,16 +113,18 @@
     const chemCount = countBlocks(content, 'chemBlock');
 
     document.getElementById('result').className = 'result show';
-    document.getElementById('result').textContent =
-      '✅ Form submitted!\n\n' +
-      'Title: ' + data.title + '\n' +
-      'Math blocks: ' + mathCount + '\n' +
-      'Chemistry blocks: ' + chemCount + '\n\n' +
-      'Content (JSON):\n' + JSON.stringify(content, null, 2) + '\n\n' +
-      '─── In PHP, you would receive: ───\n' +
-      '$_POST["title"]   = "' + data.title + '"\n' +
-      '$_POST["content"] = (the JSON above)\n\n' +
-      'Store it directly in your database as a JSON/TEXT column.';
+    const displayHTML = CBTEditor.displayHTML(content);
+
+    document.getElementById('result').innerHTML =
+      '<strong>✅ Form submitted!</strong><br><br>' +
+      '<strong>Title:</strong> ' + data.title + '<br>' +
+      '<strong>Math blocks:</strong> ' + mathCount + ' | ' +
+      '<strong>Chemistry blocks:</strong> ' + chemCount + '<br><br>' +
+      '<strong>📄 Display HTML (for showing to students/public):</strong>' +
+      '<div style="background:#fff;color:#111;padding:12px;border-radius:6px;margin:8px 0;line-height:1.6;">' + displayHTML + '</div>' +
+      '<br><strong>🗄 Raw JSON (for database storage):</strong>' +
+      '<pre style="margin-top:4px;white-space:pre-wrap;">' + JSON.stringify(content, null, 2) + '</pre>' +
+      '<br><em>─── In PHP: $_POST["title"] = "' + data.title + '" | $_POST["content"] = the JSON above ───</em>';
 
     // Scroll the result into view
     document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
