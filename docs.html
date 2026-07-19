@@ -284,29 +284,33 @@ const editor = new CBTEditor({
     <h2>Usage &amp; API Reference</h2>
 
     <h3>Creating an Editor</h3>
-    <pre><code>const editor = new CBTEditor({
+    <pre><code>// The hidden input auto-syncs clean HTML (like CKEditor/TinyMCE).
+// $_POST['content'] will be display-ready HTML — not JSON.
+new CBTEditor({
   target: document.getElementById('editor'),  // REQUIRED
-  initialContent: myDocumentJSON,              // optional
-  onSave: (json) => { /* handle save */ },     // optional
-  readOnly: false                              // optional
+  name: 'content',                             // optional: reads from element
+  value: savedDocumentJSON,                    // optional: pre-load for editing
+  readOnly: false,                             // optional
+  onChange: (json) => { /* json for re-editing */ }  // optional
 });</code></pre>
 
     <h3>Options</h3>
     <table>
       <tr><th>Option</th><th>Type</th><th>Default</th><th>Description</th></tr>
-      <tr><td><code>target</code></td><td><code>HTMLElement</code></td><td><em>required</em></td><td>The DOM element to mount the editor into</td></tr>
-      <tr><td><code>initialContent</code></td><td><code>Object</code></td><td><code>null</code></td><td>A TipTap-compatible JSON document to load on init</td></tr>
-      <tr><td><code>onSave</code></td><td><code>Function</code></td><td><code>null</code></td><td>Called with document JSON when user clicks Save</td></tr>
+      <tr><td><code>target</code></td><td><code>HTMLElement</code></td><td><em>required</em></td><td>The DOM element to mount the editor into. Reads <code>name</code> and <code>data-value</code> from the element.</td></tr>
+      <tr><td><code>name</code></td><td><code>string</code></td><td><em>from element</em></td><td>Form field name. Creates <code>&lt;input type="hidden" name="X"&gt;</code> that auto-syncs <strong>clean HTML</strong>. Submit your form normally — <code>$_POST['X']</code> contains display-ready HTML.</td></tr>
+      <tr><td><code>value</code></td><td><code>Object</code></td><td><code>null</code></td><td>JSON document to pre-load (for editing). Math/chem blocks come back editable.</td></tr>
       <tr><td><code>readOnly</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Whether the editor is read-only</td></tr>
+      <tr><td><code>onChange</code></td><td><code>Function</code></td><td><code>null</code></td><td>Called with document JSON on every change (for saving re-editable state)</td></tr>
     </table>
 
     <h3>Methods</h3>
 
-    <p><strong><code>editor.getJSON()</code></strong> — Returns the full document as a TipTap-compatible JSON object.</p>
-    <pre><code>const doc = editor.getJSON();</code></pre>
+    <p><strong><code>editor.getJSON()</code></strong> — Returns the full document as JSON (for re-editing later).</p>
+    <pre><code>const json = editor.getJSON();  // store this for re-editing</code></pre>
 
-    <p><strong><code>editor.getHTML()</code></strong> — Returns the document as an HTML string.</p>
-    <pre><code>const html = editor.getHTML();</code></pre>
+    <p><strong><code>editor.getHTML()</code></strong> — Returns the document as display-ready HTML.</p>
+    <pre><code>const html = editor.getHTML();   // &lt;p&gt;&lt;strong&gt;Hello&lt;/strong&gt;&lt;/p&gt;</code></pre>
 
     <p><strong><code>editor.loadJSON(json)</code></strong> — Loads a document from JSON (replaces current content).</p>
     <pre><code>editor.loadJSON(savedDocument);</code></pre>
@@ -324,8 +328,9 @@ editor.setReadOnly(false); // enable editing</code></pre>
 });</code></pre>
 
     <h3>Static Method</h3>
-    <p><strong><code>CBTEditor.setMathLiveFontsDir(dir)</code></strong> — Sets the directory where MathLive looks for its KaTeX font files. Call once before creating any editor.</p>
-    <pre><code>CBTEditor.setMathLiveFontsDir('./dist/fonts');</code></pre>
+    <p><strong><code>CBTEditor.displayHTML(json)</code></strong> — Static method: converts saved JSON to clean display HTML. No editor instance needed.</p>
+    <pre><code>const html = CBTEditor.displayHTML(savedJSON);
+document.getElementById('preview').innerHTML = html;</code></pre>
   </section>
 
   <!-- ── EXPORT / IMPORT ───────────────────────────────────── -->

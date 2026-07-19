@@ -156,7 +156,7 @@
       <span class="badge badge-vanilla">⚡ Vanilla JS (No React)</span>
     </div>
     <div class="cta">
-      <a class="btn btn-primary" href="cbt-editor-v0.1.0.zip" download>⬇ Download ZIP (v0.1.0)</a>
+      <a class="btn btn-primary" href="cbt-editor-v1.1.0.zip" download>⬇ Download ZIP (v1.1.0)</a>
       <a class="btn btn-secondary" href="demo.html">🎮 Live Demo</a>
     </div>
   </header>
@@ -238,7 +238,7 @@
     <p><strong>Option A — Plain <code class="inline-code">&lt;script&gt;</code> tag</strong> (no build tools):</p>
     <pre><code>&lt;form method="POST" action="/save"&gt;
   &lt;input name="title" placeholder="Title"&gt;
-  &lt;div id="editor"&gt;&lt;/div&gt;
+  &lt;div id="editor" name="content"&gt;&lt;/div&gt;
   &lt;button type="submit"&gt;Submit&lt;/button&gt;
 &lt;/form&gt;
 
@@ -246,10 +246,8 @@
 &lt;script src="cbt-editor.min.js"&gt;&lt;/script&gt;
 &lt;script&gt;
   CBTEditor.setMathLiveFontsDir('./fonts');
-  new CBTEditor({
-    target: document.getElementById('editor'),
-    name: 'content'   // &larr; auto-syncs JSON to hidden input
-  });
+  new CBTEditor({ target: document.getElementById('editor') });
+  // name="content" on the div → $_POST['content'] = clean HTML
 &lt;/script&gt;</code></pre>
 
     <p style="margin-top: 16px;"><strong>Option B — npm</strong> (for bundler-based projects):</p>
@@ -278,7 +276,7 @@
 
   <section>
     <h2>📦 What's in the ZIP?</h2>
-    <pre><code>cbt-editor-v0.1.0/
+    <pre><code>cbt-editor-v1.1.0/
 ├── cbt-editor.min.js      ← The editor (UMD, self-contained)
 ├── cbt-editor.min.css     ← Styles
 ├── fonts/                 ← MathLive math fonts
@@ -296,39 +294,36 @@
 
   <section>
     <h2>🔧 Using in PHP / WordPress</h2>
-    <p>Same snippet — just drop it into any PHP template. The editor auto-syncs to a hidden input, so your existing form submission works unchanged:</p>
+    <p>Same snippet — just drop it into any PHP template. The hidden input auto-syncs <strong>clean HTML</strong> (like CKEditor), so your form submission works unchanged:</p>
     <pre><code>&lt;?php // In your PHP page or WordPress template ?&gt;
 &lt;link rel="stylesheet" href="&lt;?php echo get_template_directory_uri(); ?&gt;/cbt-editor.min.css"&gt;
 &lt;script src="&lt;?php echo get_template_directory_uri(); ?&gt;/cbt-editor.min.js"&gt;&lt;/script&gt;
 
 &lt;form method="POST"&gt;
   &lt;input name="title" placeholder="Title"&gt;
-  &lt;div id="editor"&gt;&lt;/div&gt;
+  &lt;div id="editor" name="content"&gt;&lt;/div&gt;
   &lt;button type="submit"&gt;Submit&lt;/button&gt;
 &lt;/form&gt;
 
 &lt;script&gt;
   CBTEditor.setMathLiveFontsDir('&lt;?php echo get_template_directory_uri(); ?&gt;/fonts');
-  new CBTEditor({
-    target: document.getElementById('editor'),
-    name: 'content'
-  });
+  new CBTEditor({ target: document.getElementById('editor') });
 &lt;/script&gt;
 
 &lt;?php
-// On form submit, $_POST['content'] contains the full document JSON.
-// Store it directly in your database.
+// $_POST['content'] = '&lt;p&gt;&lt;strong&gt;Hello&lt;/strong&gt; World&lt;/p&gt;' ← CLEAN HTML!
+// Display it directly, or store it in your database.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $title   = $_POST['title'];
-    $content = $_POST['content'];  // JSON — store as-is
-    // $db->query("INSERT INTO documents (title, content) VALUES (?, ?)", [$title, $content]);
+    $html = $_POST['content'];  // Display-ready HTML — just like CKEditor
+    // $db-&gt;query("INSERT INTO posts (body) VALUES (?)", [$html]);
+    echo $html;  // renders as formatted content
 }
 ?&gt;</code></pre>
   </section>
 
   <footer>
     <p>
-      CBTEditor v0.1.0 — MIT License — Built with
+      CBTEditor v1.1.0 — MIT License — Built with
       Built with <a href="https://tiptap.dev/" target="_blank" rel="noopener">TipTap</a> +
       <a href="https://mathlive.io/" target="_blank" rel="noopener">MathLive</a>
     </p>
