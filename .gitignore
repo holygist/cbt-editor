@@ -1,0 +1,8 @@
+node_modules/
+dist/
+src/
+package.json
+package-lock.json
+rollup.config.js
+.DS_Store
+fonts/fonts/
